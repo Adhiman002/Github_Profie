@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        /* Reset and Base Styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #f0f4f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        form {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        input[type="search"] {
+            width: 100%;
+            max-width: 600px;
+            padding: 15px;
+            border: none;
+            border-radius: 25px;
+            font-size: 18px;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            transition: box-shadow 0.3s ease;
+        }
+
+        input[type="search"]:focus {
+            outline: none;
+            box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .main {
+            width: 100%;
+            max-width: 800px;
+
+        }
+
+        /* Card Design */
+        .card {
+            background-color: #ffffff;
+
+            box-shadow: 0px 8px 24px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+
+
+
+        /* Profile Picture */
+        .profile_pic {
+            margin-bottom: 20px;
+        }
+
+        .profile_pic img {
+            border-radius: 50%;
+            width: 150px;
+            height: 150px;
+            object-fit: cover;
+            border: 4px solid #007bff;
+            transition: border-color 0.3s ease;
+        }
+
+        .card:hover .profile_pic img {
+            border-color: #0056b3;
+        }
+
+        /* Profile Content */
+        .content {
+            text-align: center;
+        }
+
+        .content h3 {
+            font-size: 26px;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .content .bio {
+            font-size: 16px;
+            color: #777;
+            margin-bottom: 20px;
+        }
+
+        .content ul {
+            list-style-type: none;
+            padding: 0;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .content ul li {
+            font-size: 18px;
+            color: #555;
+            margin: 10px 0;
+        }
+
+        /* Repositories Section */
+        #repos {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            padding: 20px;
+            background-color: #ffffff;
+            border-radius: 10px;
+            width: 100%;
+        }
+
+        .repo {
+            background-color: #007bff;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+
+        .repo:hover {
+            background-color: #0056b3;
+        }
+
+        /* Responsive Design */
+        @media (min-width: 768px) {
+            .card {
+                flex-direction: row;
+                padding: 40px;
+            }
+
+            .profile_pic {
+                margin-right: 40px;
+            }
+
+            .content {
+                text-align: left;
+            }
+
+            #repos {
+                justify-content: flex-start;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .profile_pic img {
+                width: 100px;
+                height: 100px;
+            }
+
+            .content h3 {
+                font-size: 22px;
+            }
+
+            .content ul li {
+                font-size: 16px;
+            }
+
+            .repo {
+                font-size: 12px;
+                padding: 8px 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <form onsubmit="return formSubmit()"><input type="search" autofocus name="" id=""
+                placeholder="Please enter username to find your github profile"></form>
+        <div class="main">
+
+        </div>
+    </div>
+
+
+    <script>
+        const Api = "https://api.github.com/users/";
+        const main = document.querySelector('.main');
+        const getUser = async (username) => {
+            const response = await fetch(Api + username);
+            const data = await response.json()
+            console.log(data);
+            const card = `
+                <div class="card">
+                    <div class="profile_pic">
+                        <img src="${data.avatar_url}" alt="">
+                    </div>
+                    <div class="content">
+                        <h3 class="profile_name">${data.name}</h3>
+                        <p class="bio"><b>Bio:-</b> ${data.bio}</p>
+                        <ul>
+                            <li><b>Followers : </b> ${data.followers}</li>
+                            <li><b>Following : </b> ${data.following}</li>
+                            <li><b>Repos : </b> ${data.public_repos}</li>
+                        </ul>   
+                    </div>
+                   
+                </div>
+                 <div id='repos'>
+                        
+                    </div>
+                
+                `
+            main.innerHTML = card;
+            getRepos(username);
+        }
+        getUser('Adhiman002')
+
+        const getRepos = async (username) => {
+            const repos = document.querySelector('#repos');
+            const response = await fetch(Api + username + '/repos')
+            const data = await response.json();
+            // console.log(data)
+            data.forEach(item => {
+                console.log(item)
+                const ele = document.createElement('a');
+                ele.classList.add('repo')
+                ele.href = item.html_url;
+                ele.target = '_blank';
+                ele.innerText = item.name;
+                repos.appendChild(ele)
+            });
+        }
+
+        const formSubmit = () => {
+            const searchbox = document.querySelector('input')
+            if (searchbox.value != " ") {
+                getUser(searchbox.value);
+            }
+            return false;
+        }
+    </script>
+</body>
+
+</html>
